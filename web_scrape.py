@@ -5,6 +5,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
+import subprocess
 import os
 
 # API Keys (Replace with your actual keys)
@@ -19,9 +20,32 @@ TAVILY_API_KEY = os.environ["TAVILY_API_KEY"]
 
 
 
+def install_chromedriver():
+    """Ensures that ChromeDriver matches the installed Chromium version."""
+    try:
+        # Get Chromium version
+        result = subprocess.run(["chromium", "--version"], capture_output=True, text=True)
+        chromium_version = result.stdout.strip().split()[1]  # Extract version number
+        major_version = chromium_version.split(".")[0]  # Get major version (e.g., "120")
+
+        # Install matching ChromeDriver
+        chromedriver_url = f"https://storage.googleapis.com/chrome-for-testing-public/{chromium_version}/linux64/chromedriver-linux64.zip"
+        subprocess.run(["wget", "-q", "-O", "/tmp/chromedriver.zip", chromedriver_url])
+        subprocess.run(["unzip", "-o", "/tmp/chromedriver.zip", "-d", "/usr/bin/"])
+        subprocess.run(["chmod", "+x", "/usr/bin/chromedriver"])
+        print(f"✅ Installed ChromeDriver {major_version} (matching Chromium {chromium_version})")
+    except Exception as e:
+        print(f"❌ Error installing ChromeDriver: {e}")
+
+
+
+
+
+
 
 def scrape_website(url):
     """Scrapes website data using Selenium in headless mode and saves it to a file."""
+    install_chromedriver()
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
     chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration
