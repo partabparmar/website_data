@@ -1,0 +1,7 @@
+selenium
+webdriver_manager
+tavily-python
+streamlit
+audio-recorder-streamlit
+requests
+python-dotenv
