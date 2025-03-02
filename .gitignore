@@ -1,0 +1,4 @@
+.env
+__pycache__/
+temp_audio.wav
+final_analysis.txt
