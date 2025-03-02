@@ -38,25 +38,28 @@ def get_driver():
         options=options,
     )
 
-def search_google(query):
-    """Search Google for a query and return the top search result URLs."""
+def google_search(query):
+    """Search Google and return the first search result URL."""
     driver = get_driver()
     driver.get("https://www.google.com")
-    
+    time.sleep(2)
+
     # Find search bar and enter query
     search_box = driver.find_element(By.NAME, "q")
     search_box.send_keys(query)
     search_box.send_keys(Keys.RETURN)
-    time.sleep(3)  # Wait for results to load
-    
-    # Extract top search result URLs
-    search_results = driver.find_elements(By.CSS_SELECTOR, "div.tF2Cxc a")
-    urls = [result.get_attribute("href") for result in search_results[:3]]  # Get top 3 results
+    time.sleep(3)
 
-    driver.quit()
-    return urls
+    # Extract first search result URL
+    try:
+        first_result = driver.find_element(By.XPATH, "//div[@class='tF2Cxc']/div/a")
+        url = first_result.get_attribute("href")
+        print(f"🔗 First search result: {url}")
+    except Exception as e:
+        print(f"⚠️ No search results found: {str(e)}")
+        driver.quit()
+        return None
 
-   
 
 
 
@@ -178,7 +181,8 @@ def analyze_with_openai(filename, website_url):
 
 
 def main_scrape(url):
-    url= search_google(url)
+    url=url.strip()
+    url= google_search(url)
     raw_data_file = scrape_website(url)
     search_with_tavily(url)
     analyze_with_openai(raw_data_file, url)
