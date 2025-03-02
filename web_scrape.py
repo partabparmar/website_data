@@ -8,8 +8,17 @@ from webdriver_manager.chrome import ChromeDriverManager
 import os
 
 # API Keys (Replace with your actual keys)
-TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+# TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
+# OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+
+# for github
+import os
+OPENAI_API_KEY = os.environ["OPENAI_API_KEY"]
+TAVILY_API_KEY = os.environ["TAVILY_API_KEY"]
+
+
+
+
 
 def scrape_website(url):
     """Scrapes website data using Selenium in headless mode and saves it to a file."""
