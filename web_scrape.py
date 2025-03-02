@@ -26,35 +26,41 @@ TAVILY_API_KEY = os.environ["TAVILY_API_KEY"]
 
 
 def get_driver():
-    """Initialize and return a Selenium WebDriver in headless mode."""
+    """Initialize a headless Selenium WebDriver."""
     options = Options()
-    options.add_argument("--headless")
     options.add_argument("--disable-gpu")
+    options.add_argument("--headless=new")  # Runs without opening a browser window
     options.add_argument("--no-sandbox")
     options.add_argument("--disable-dev-shm-usage")
-    
+
     return webdriver.Chrome(
         service=Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()),
         options=options,
     )
 
-def google_search(query):
-    """Search Google and return the first search result URL."""
+def google_search_and_open(url):
+    """Search for a specific website on Google and open it."""
     driver = get_driver()
     driver.get("https://www.google.com")
     time.sleep(2)
 
-    # Find search bar and enter query
+    # Locate search bar and enter URL
     search_box = driver.find_element(By.NAME, "q")
-    search_box.send_keys(query)
+    search_box.send_keys(url)
     search_box.send_keys(Keys.RETURN)
     time.sleep(3)
 
-    # Extract first search result URL
+    # Click the first search result
     try:
         first_result = driver.find_element(By.XPATH, "//div[@class='tF2Cxc']/div/a")
-        url = first_result.get_attribute("href")
-        print(f"🔗 First search result: {url}")
+        first_result.click()
+        time.sleep(3)
+
+        # Get the opened website URL
+        current_url = driver.current_url
+        print(f"🔗 Navigated to: {current_url}")
+        return driver  # Keep browser open for scraping
+
     except Exception as e:
         print(f"⚠️ No search results found: {str(e)}")
         driver.quit()
@@ -63,7 +69,7 @@ def google_search(query):
 
 
 
-def scrape_website(url):
+def scrape_website(driver):
     """Scrapes website data using Selenium in headless mode and saves it to a file."""
     # chrome_options = Options()
     # chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
@@ -73,8 +79,8 @@ def scrape_website(url):
 
     # service = Service(ChromeDriverManager().install())
     # driver = webdriver.Chrome(service=service, options=chrome_options)
-    driver = get_driver()
-    driver.get(url)
+    #driver = get_driver()
+    #driver.get(url)
     time.sleep(3)
 
     # Extract website text (paragraphs, spans, headers, footers, h1-h5)
@@ -181,8 +187,9 @@ def analyze_with_openai(filename, website_url):
 
 
 def main_scrape(url):
-    url= google_search(url)
-    raw_data_file = scrape_website(url)
+    driver = google_search_and_open(url)
+    
+    raw_data_file = scrape_website(driver)
     search_with_tavily(url)
     analyze_with_openai(raw_data_file, url)
 
