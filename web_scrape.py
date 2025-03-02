@@ -6,6 +6,11 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from webdriver_manager.chrome import ChromeDriverManager
 import os
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
 
 # API Keys (Replace with your actual keys)
 # TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
@@ -18,19 +23,52 @@ TAVILY_API_KEY = os.environ["TAVILY_API_KEY"]
 
 
 
+def get_driver():
+    """Initialize and return a Selenium WebDriver in headless mode."""
+    options = Options()
+    options.add_argument("--headless")
+    options.add_argument("--disable-gpu")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+    
+    return webdriver.Chrome(
+        service=Service(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()),
+        options=options,
+    )
+
+def search_google(query):
+    """Search Google for a query and return the top search result URLs."""
+    driver = get_driver()
+    driver.get("https://www.google.com")
+    
+    # Find search bar and enter query
+    search_box = driver.find_element(By.NAME, "q")
+    search_box.send_keys(query)
+    search_box.send_keys(Keys.RETURN)
+    time.sleep(3)  # Wait for results to load
+    
+    # Extract top search result URLs
+    search_results = driver.find_elements(By.CSS_SELECTOR, "div.tF2Cxc a")
+    urls = [result.get_attribute("href") for result in search_results[:3]]  # Get top 3 results
+
+    driver.quit()
+    return urls
+
+   
 
 
 
 def scrape_website(url):
     """Scrapes website data using Selenium in headless mode and saves it to a file."""
-    chrome_options = Options()
-    chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
-    chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration
-    chrome_options.add_argument("--no-sandbox")  # Required for some environments
-    chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resources in containers
+    # chrome_options = Options()
+    # chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
+    # chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration
+    # chrome_options.add_argument("--no-sandbox")  # Required for some environments
+    # chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resources in containers
 
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=chrome_options)
+    # service = Service(ChromeDriverManager().install())
+    # driver = webdriver.Chrome(service=service, options=chrome_options)
+    driver = get_driver()
     driver.get(url)
     time.sleep(3)
 
@@ -138,6 +176,7 @@ def analyze_with_openai(filename, website_url):
 
 
 def main_scrape(url):
+    url= search_google(url)
     raw_data_file = scrape_website(url)
     search_with_tavily(url)
     analyze_with_openai(raw_data_file, url)
