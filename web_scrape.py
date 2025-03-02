@@ -20,22 +20,19 @@ TAVILY_API_KEY = os.environ["TAVILY_API_KEY"]
 
 
 
-def install_chromedriver():
-    """Ensures that ChromeDriver matches the installed Chromium version."""
-    try:
-        # Get Chromium version
-        result = subprocess.run(["chromium", "--version"], capture_output=True, text=True)
-        chromium_version = result.stdout.strip().split()[1]  # Extract version number
-        major_version = chromium_version.split(".")[0]  # Get major version (e.g., "120")
+def install_correct_chromedriver():
+    """Automatically installs the correct ChromeDriver version for the installed Chromium."""
+    # Find Chromium version
+    chromium_version = subprocess.check_output(["chromium", "--version"]).decode("utf-8").strip().split()[-1]
+    major_version = chromium_version.split('.')[0]
 
-        # Install matching ChromeDriver
-        chromedriver_url = f"https://storage.googleapis.com/chrome-for-testing-public/{chromium_version}/linux64/chromedriver-linux64.zip"
-        subprocess.run(["wget", "-q", "-O", "/tmp/chromedriver.zip", chromedriver_url])
-        subprocess.run(["unzip", "-o", "/tmp/chromedriver.zip", "-d", "/usr/bin/"])
-        subprocess.run(["chmod", "+x", "/usr/bin/chromedriver"])
-        print(f"✅ Installed ChromeDriver {major_version} (matching Chromium {chromium_version})")
-    except Exception as e:
-        print(f"❌ Error installing ChromeDriver: {e}")
+    # Download the matching ChromeDriver
+    driver_url = f"https://storage.googleapis.com/chrome-for-testing-public/{chromium_version}/linux64/chromedriver-linux64.zip"
+    subprocess.run(["wget", driver_url, "-O", "chromedriver.zip"], check=True)
+    subprocess.run(["unzip", "-o", "chromedriver.zip"], check=True)
+    subprocess.run(["chmod", "+x", "chromedriver-linux64/chromedriver"], check=True)
+
+    return os.path.abspath("chromedriver-linux64/chromedriver")
 
 
 
@@ -45,14 +42,14 @@ def install_chromedriver():
 
 def scrape_website(url):
     """Scrapes website data using Selenium in headless mode and saves it to a file."""
-    install_chromedriver()
+    
     chrome_options = Options()
     chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
     chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration
     chrome_options.add_argument("--no-sandbox")  # Required for some environments
     chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resources in containers
-
-    service = Service(ChromeDriverManager().install())
+    chromedriver_path = install_correct_chromedriver()
+    service = Service(chromedriver_path)
     driver = webdriver.Chrome(service=service, options=chrome_options)
     driver.get(url)
     time.sleep(3)
