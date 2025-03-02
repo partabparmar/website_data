@@ -11,6 +11,8 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.core.os_manager import ChromeType
+from selenium.webdriver.common.keys import Keys
+
 
 # API Keys (Replace with your actual keys)
 # TAVILY_API_KEY = os.getenv("TAVILY_API_KEY")
