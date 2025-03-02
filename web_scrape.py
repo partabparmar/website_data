@@ -181,7 +181,6 @@ def analyze_with_openai(filename, website_url):
 
 
 def main_scrape(url):
-    url=url.strip()
     url= google_search(url)
     raw_data_file = scrape_website(url)
     search_with_tavily(url)
@@ -189,6 +188,7 @@ def main_scrape(url):
 
 
 if __name__ == "__main__":
+    #url="https://appedology.pk/"
     main_scrape(url)
 
     
