@@ -188,8 +188,8 @@ def main_scrape(url):
     
     raw_data_file = scrape_website(url)
     tavily_search=search_with_tavily(url)
-    raw_data=raw_data_file+tavily_search
-    print(raw_data)
+    raw_data = raw_data_file + "\n\n" + tavily_search  
+    print(raw_data)  # Print the combined data
     analyze_with_openai(raw_data, url)
 
 
