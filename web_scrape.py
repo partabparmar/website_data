@@ -98,6 +98,7 @@ def scrape_website(url):
 
     # Save scraped data to a file
     scraped_content = "\n".join(paragraphs + spans + headers + footers + headings)
+    print("scraped_content",scraped_content)
     return scraped_content
     # with open("raw_scraped_data.txt", "w", encoding="utf-8") as file:
     #     file.write(f"Scraped Data from {url}:\n\n{scraped_content}\n")
