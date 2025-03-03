@@ -38,8 +38,25 @@ def get_driver():
         options=options,
     )
 
-def google_search_and_open(url):
-    """Search for a specific website on Google and open it."""
+
+
+    
+
+
+
+
+def scrape_website(url):
+    """Scrapes website data using Selenium in headless mode and saves it to a file."""
+    # chrome_options = Options()
+    # chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
+    # chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration
+    # chrome_options.add_argument("--no-sandbox")  # Required for some environments
+    # chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resources in containers
+
+    # service = Service(ChromeDriverManager().install())
+    # driver = webdriver.Chrome(service=service, options=chrome_options)
+    #driver = get_driver()
+    #driver.get(url)
     driver = get_driver()
     driver.get("https://www.google.com")
     time.sleep(2)
@@ -57,30 +74,14 @@ def google_search_and_open(url):
         time.sleep(3)
 
         # Get the opened website URL
-        current_url = driver.current_url
-        print(f"🔗 Navigated to: {current_url}")
-        return current_url   # Keep browser open for scraping
+        driver = driver.current_url
+        
+          # Keep browser open for scraping
 
     except Exception as e:
         print(f"⚠️ No search results found: {str(e)}")
         driver.quit()
         return None
-
-
-
-
-def scrape_website(driver):
-    """Scrapes website data using Selenium in headless mode and saves it to a file."""
-    # chrome_options = Options()
-    # chrome_options.add_argument("--headless")  # Run in headless mode (no GUI)
-    # chrome_options.add_argument("--disable-gpu")  # Disable GPU acceleration
-    # chrome_options.add_argument("--no-sandbox")  # Required for some environments
-    # chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resources in containers
-
-    # service = Service(ChromeDriverManager().install())
-    # driver = webdriver.Chrome(service=service, options=chrome_options)
-    #driver = get_driver()
-    #driver.get(url)
     time.sleep(3)
 
     # Extract website text (paragraphs, spans, headers, footers, h1-h5)
@@ -187,9 +188,9 @@ def analyze_with_openai(filename, website_url):
 
 
 def main_scrape(url):
-    driver = google_search_and_open(url)
     
-    raw_data_file = scrape_website(driver)
+    
+    raw_data_file = scrape_website(url)
     search_with_tavily(url)
     analyze_with_openai(raw_data_file, url)
 
