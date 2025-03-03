@@ -59,7 +59,7 @@ def google_search_and_open(url):
         # Get the opened website URL
         current_url = driver.current_url
         print(f"🔗 Navigated to: {current_url}")
-        return driver  # Keep browser open for scraping
+        return current_url   # Keep browser open for scraping
 
     except Exception as e:
         print(f"⚠️ No search results found: {str(e)}")
