@@ -116,22 +116,16 @@ def search_with_tavily(query):
     if response.status_code == 200:
         results = response.json().get("results", [])
         tavily_content = "\n".join([f"{r['title']} - {r['url']}" for r in results])
-
-        # Append Tavily data to the same file
-        with open("raw_scraped_data.txt", "a", encoding="utf-8") as file:
-            file.write(" Detail of Website:\n\n")
-            file.write(tavily_content + "\n")
-
+        return tavily_content
     else:
         print(f"Tavily API Error: {response.status_code}, Message: {response.text}")
 
-def analyze_with_openai(filename, website_url):
+def analyze_with_openai(website_data, website_url):
     """Reads the scraped file and sends it to OpenAI API for structured analysis."""
-    with open(filename, "r", encoding="utf-8") as file:
-        scraped_data = file.read()
+    
 
     prompt = f"""Analyze the website {website_url} and its Website Data:
-    {scraped_data}. If you do not know, leave the section blank and provide accurate results.
+    {website_data}. If you do not know, leave the section blank and provide accurate results.
     Provide a comprehensive report, including:
 
     Company Overview
@@ -193,12 +187,14 @@ def main_scrape(url):
     
     
     raw_data_file = scrape_website(url)
-    search_with_tavily(url)
-    analyze_with_openai(raw_data_file, url)
+    tavily_search=search_with_tavily(url)
+    raw_data=raw_data_file+tavily_search
+    print(raw_data)
+    analyze_with_openai(raw_data, url)
 
 
 if __name__ == "__main__":
-    #url="https://appedology.pk/"
+    url="https://appedology.pk/"
     main_scrape(url)
 
     
