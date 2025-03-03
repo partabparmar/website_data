@@ -98,10 +98,11 @@ def scrape_website(url):
 
     # Save scraped data to a file
     scraped_content = "\n".join(paragraphs + spans + headers + footers + headings)
-    with open("raw_scraped_data.txt", "w", encoding="utf-8") as file:
-        file.write(f"Scraped Data from {url}:\n\n{scraped_content}\n")
+    return scraped_content
+    # with open("raw_scraped_data.txt", "w", encoding="utf-8") as file:
+    #     file.write(f"Scraped Data from {url}:\n\n{scraped_content}\n")
 
-    return "raw_scraped_data.txt"
+    # return "raw_scraped_data.txt"
 
 def search_with_tavily(query):
     """Fetches additional web data using Tavily API and appends it to the file."""
