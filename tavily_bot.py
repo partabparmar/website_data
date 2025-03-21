@@ -6,7 +6,7 @@ import os
 from io import BytesIO
 from dotenv import load_dotenv
 from web_scrape import main_scrape  # External scraping function
-load_dotenv(override=True)
+
 # Load environment variables
 load_dotenv()
 
